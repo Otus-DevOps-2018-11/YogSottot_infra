@@ -8,9 +8,9 @@ YogSottot Infra repository
 ```ssh  -vvv -A -t utrgroup@35.228.152.71 ssh 10.166.0.3```
 
 Где:  
-utrgroup — имя пользователя  
-35.228.152.71 — bastion
-10.166.0.3 — someinternalhost
+- utrgroup — имя пользователя  
+- 35.228.152.71 — bastion  
+- 10.166.0.3 — someinternalhost
 
 **вариант решения для подключения из консоли при помощи команды вида ssh someinternalhost из локальной консоли рабочего устройства, чтобы подключение выполнялось по алиасу someinternalhost**  
 
@@ -31,6 +31,7 @@ Host someinternalhost
 
 
 ```bash
+[user:~IdeaProjects/YogSottot_infra] $ 
 >ssh someinternalhost
 Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1025-gcp x86_64)
 
