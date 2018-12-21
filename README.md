@@ -53,11 +53,13 @@ utrgroup@someinternalhost:~$
 
 ```
 
+</p></details>
+
+### подключение к vpn  
+
 ```bash
 
 bastion_IP = 35.228.152.71
 someinternalhost_IP = 10.166.0.3
 
 ```
-
-</p></details>
