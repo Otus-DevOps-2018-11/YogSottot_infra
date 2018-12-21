@@ -1,37 +1,39 @@
-# YogSottot_infra
-YogSottot Infra repository
+# YogSottot_infra  
 
-### ДЗ №3
+YogSottot Infra repository  
 
-**способ подключения к someinternalhost в одну команду из вашего рабочего устройства**  
+## ДЗ №3  
 
-```ssh  -vvv -A -t utrgroup@35.228.152.71 ssh 10.166.0.3```
+### способ подключения к someinternalhost в одну команду из вашего рабочего устройства  
+
+```ssh -A -t utrgroup@35.228.131.18 ssh 10.166.0.3```  
 
 Где:  
 - utrgroup — имя пользователя  
-- 35.228.152.71 — bastion  
-- 10.166.0.3 — someinternalhost
+- 35.228.131.18 — bastion  
+- 10.166.0.3 — someinternalhost  
 
-**вариант решения для подключения из консоли при помощи команды вида ssh someinternalhost из локальной консоли рабочего устройства, чтобы подключение выполнялось по алиасу someinternalhost**  
+### вариант решения для подключения из консоли при помощи команды вида ssh someinternalhost из локальной консоли рабочего устройства, чтобы подключение выполнялось по алиасу someinternalhost  
 
-Добавляем в ~/.ssh/config
+Добавляем в ~/.ssh/config  
 
-```
+```bash
+
 Host bastion
-    HostName 35.228.152.71
-	user utrgroup
+    HostName 35.228.131.18
+    User utrgroup
 
 Host someinternalhost
-	ProxyCommand ssh -A bastion -W 10.166.0.3:22
-	user utrgroup
-```
+    ProxyCommand ssh -A bastion -W 10.166.0.3:22
+    User utrgroup
 
+```
 
 <details><summary>Выполнение команды</summary><p>
 
-
 ```bash
-[user:~IdeaProjects/YogSottot_infra] $ 
+
+[user:~IdeaProjects/YogSottot_infra] $
 >ssh someinternalhost
 Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1025-gcp x86_64)
 
@@ -47,7 +49,15 @@ Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1025-gcp x86_64)
 
 
 Last login: Thu Dec 20 20:32:38 2018 from 10.166.0.2
-utrgroup@someinternalhost:~$ 
+utrgroup@someinternalhost:~$
+
+```
+
+```bash
+
+bastion_IP = 35.228.131.18
+someinternalhost_IP = 10.166.0.3
+
 ```
 
 </p></details>
