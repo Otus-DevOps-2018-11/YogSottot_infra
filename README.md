@@ -6,11 +6,11 @@ YogSottot Infra repository
 
 ### способ подключения к someinternalhost в одну команду из вашего рабочего устройства  
 
-```ssh -A -t utrgroup@35.228.131.18 ssh 10.166.0.3```  
+```ssh -A -t utrgroup@35.228.152.71 ssh 10.166.0.3```  
 
 Где:  
 - utrgroup — имя пользователя  
-- 35.228.131.18 — bastion  
+- 35.228.152.71 — bastion  
 - 10.166.0.3 — someinternalhost  
 
 ### вариант решения для подключения из консоли при помощи команды вида ssh someinternalhost из локальной консоли рабочего устройства, чтобы подключение выполнялось по алиасу someinternalhost  
@@ -20,7 +20,7 @@ YogSottot Infra repository
 ```bash
 
 Host bastion
-    HostName 35.228.131.18
+    HostName 35.228.152.71
     User utrgroup
 
 Host someinternalhost
@@ -55,7 +55,7 @@ utrgroup@someinternalhost:~$
 
 ```bash
 
-bastion_IP = 35.228.131.18
+bastion_IP = 35.228.152.71
 someinternalhost_IP = 10.166.0.3
 
 ```
