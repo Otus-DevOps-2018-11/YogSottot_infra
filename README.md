@@ -63,3 +63,46 @@ bastion_IP = 35.228.152.71
 someinternalhost_IP = 10.166.0.3
 
 ```
+
+## ДЗ №4  
+
+### подключение к testapp  
+
+```bash
+
+testapp_IP = 35.228.131.18
+testapp_port = 9292
+
+```
+
+### Дополнительные задания  
+
+#### В результате применения данной команды gcloud мы должны получать инстанс с уже запущенным приложением  
+
+```bash
+
+gcloud compute instances create reddit-app \
+--boot-disk-size=10GB \
+--image-family ubuntu-1604-lts \
+--image-project=ubuntu-os-cloud \
+--machine-type=g1-small \
+--tags puma-server \
+--restart-on-failure \
+--metadata-from-file startup-script=startup-script.sh
+
+```
+
+#### Добавление правила для firewall из консоли с помощью gcloud
+
+```bash
+
+gcloud compute firewall-rules create default-puma-server \
+--direction=INGRESS \
+--priority=1000 \
+--network=default \
+--action=ALLOW \
+--rules=tcp:9292 \
+--source-ranges=0.0.0.0/0 \
+--target-tags=puma-server
+
+```
