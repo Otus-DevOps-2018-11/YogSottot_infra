@@ -138,7 +138,7 @@ gcloud compute firewall-rules create default-puma-server \
         "machine_type": "f1-micro",
         "network": "default",
         "source_image_family": null,
-        "tags": ["puma-server"],
+        "tags": "puma-server,http-server,https-server",
         "zone": "europe-west1-b"
         },
 
@@ -159,7 +159,7 @@ Template validated successfully.
 
 ```bash
 
->packer.io build -var-file=variables.json ubuntu16.json 
+>packer.io build -var-file=variables.json ubuntu16.json
 googlecompute output will be in this color.
 
 ==> googlecompute: Checking image does not exist...
