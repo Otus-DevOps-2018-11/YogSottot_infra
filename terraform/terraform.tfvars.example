@@ -1,0 +1,7 @@
+project = "infra-226118"
+public_key_path = "~/.ssh/id_ed25519.pub"
+private_key_path = "~/.ssh/id_ed25519"
+disk_image = "reddit-base"
+region = "europe-north1"
+zone = "europe-north1-b"
+count = "2"
