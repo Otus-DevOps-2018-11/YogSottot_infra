@@ -30,7 +30,6 @@ resource "google_compute_instance" "lb" {
     agent       = false
     private_key = "${file(var.private_key_path)}"
   }
-
 }
 
 resource "google_compute_firewall" "firewall_lb" {
