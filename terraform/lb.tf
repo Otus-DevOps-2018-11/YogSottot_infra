@@ -1,52 +1,25 @@
-resource "google_compute_instance" "lb" {
-  name         = "reddit-lb"
-  machine_type = "g1-small"
-  zone         = "${var.zone}"
-  tags         = ["reddit-lb"]
+# https://www.terraform.io/docs/providers/google/r/compute_forwarding_rule.html
 
-  # определение загрузочного диска
-  boot_disk {
-    initialize_params {
-      image = "${var.disk_image}"
-    }
-  }
-
-  metadata {
-    ssh-keys = "appuser:${file(var.public_key_path)}"
-  }
-
-  # определение сетевого интерфейса
-  network_interface {
-    # сеть, к которой присоединить данный интерфейс
-    network = "default"
-
-    # использовать ephemeral IP для доступа из Интернет
-    access_config {}
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "appuser"
-    agent       = false
-    private_key = "${file(var.private_key_path)}"
-  }
+resource "google_compute_forwarding_rule" "default" {
+  description           = "Forward reddit-app requests"
+  name                  = "redditapp"
+  target                = "${google_compute_target_pool.default.self_link}"
+  load_balancing_scheme = "EXTERNAL"
+  port_range            = "9292"
 }
 
-resource "google_compute_firewall" "firewall_lb" {
-  name = "allow-lb-default"
+resource "google_compute_target_pool" "default" {
+  description   = "Reddit-app instances list"
+  name          = "reddit-app-instances"
+  instances     = ["${google_compute_instance.app.*.self_link}"]
+  health_checks = ["${google_compute_http_health_check.default.name}"]
+}
 
-  # Название сети, в которой действует правило
-  network = "default"
-
-  # Какой доступ разрешить
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
-  }
-
-  # Каким адресам разрешаем доступ
-  source_ranges = ["0.0.0.0/0"]
-
-  # Правило применимо для инстансов с перечисленными тэгами
-  target_tags = ["reddit-lb"]
+resource "google_compute_http_health_check" "default" {
+  description         = "Reddit-app check availability of instances"
+  name                = "reddit-app-health-check"
+  port                = 9292
+  check_interval_sec  = 3
+  timeout_sec         = 3
+  unhealthy_threshold = 3
 }

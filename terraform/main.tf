@@ -10,21 +10,20 @@ resource "google_compute_project_metadata_item" "default" {
 }
 
 resource "google_compute_instance" "app" {
-  #count        = "${var.count}"
-  #name         = "reddit-app${count.index+1}"
-  name = "reddit-app"
+  count = "${var.count}"
+  name  = "reddit-app${count.index+1}"
+
+  #name = "reddit-app"
 
   machine_type = "g1-small"
   zone         = "${var.zone}"
   tags         = ["reddit-app"]
-
   # определение загрузочного диска
   boot_disk {
     initialize_params {
       image = "${var.disk_image}"
     }
   }
-
   # определение сетевого интерфейса
   network_interface {
     # сеть, к которой присоединить данный интерфейс
@@ -33,19 +32,16 @@ resource "google_compute_instance" "app" {
     # использовать ephemeral IP для доступа из Интернет
     access_config {}
   }
-
   connection {
     type        = "ssh"
     user        = "appuser"
     agent       = false
     private_key = "${file(var.private_key_path)}"
   }
-
   provisioner "file" {
     source      = "files/puma.service"
     destination = "/tmp/puma.service"
   }
-
   provisioner "remote-exec" {
     script = "files/deploy.sh"
   }
