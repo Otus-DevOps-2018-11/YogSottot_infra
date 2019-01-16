@@ -117,6 +117,8 @@ gcloud compute firewall-rules create default-puma-server \
 
 ## ДЗ №5  
 
+<details><summary>Спойлер</summary><p>
+
 параметризированы:  
 - ID проекта (обязательно)  
 - source_image_family (обязательно)  
@@ -779,3 +781,402 @@ Build 'googlecompute' finished.
 - Добавлен скрипт для установки всех зависимостей в образ — backed.sh  
 - Добавлен systemd unit для puma  
 - Добавлен скрипт для создания вм на базе полного образа — create-reddit-vm.sh  
+
+</p></details>
+
+## ДЗ №6  
+
+- установлен terraform и tflint  
+- создан инстанс с помощью tf
+- добавлен ssh-ключ
+- добавлен тег файрволла
+- добавлен скрипт деплоя
+- переразвёрнут инстанс с деплоем приложения
+- добавлены входные переменные
+- переменные определены в terraform.tfvars
+- удалён и создан инстанс
+
+<details><summary>Создание инстанса</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_firewall.firewall_puma: Creating...
+  allow.#:                  "" => "1"
+  allow.931060522.ports.#:  "" => "1"
+  allow.931060522.ports.0:  "" => "9292"
+  allow.931060522.protocol: "" => "tcp"
+  creation_timestamp:       "" => "<computed>"
+  destination_ranges.#:     "" => "<computed>"
+  direction:                "" => "<computed>"
+  name:                     "" => "allow-puma-default"
+  network:                  "" => "default"
+  priority:                 "" => "1000"
+  project:                  "" => "<computed>"
+  self_link:                "" => "<computed>"
+  source_ranges.#:          "" => "1"
+  source_ranges.1080289494: "" => "0.0.0.0/0"
+  target_tags.#:            "" => "1"
+  target_tags.1799682348:   "" => "reddit-app"
+google_compute_instance.app: Creating...
+  boot_disk.#:                                         "" => "1"
+  boot_disk.0.auto_delete:                             "" => "true"
+  boot_disk.0.device_name:                             "" => "<computed>"
+  boot_disk.0.disk_encryption_key_sha256:              "" => "<computed>"
+  boot_disk.0.initialize_params.#:                     "" => "1"
+  boot_disk.0.initialize_params.0.image:               "" => "reddit-base"
+  boot_disk.0.initialize_params.0.size:                "" => "<computed>"
+  boot_disk.0.initialize_params.0.type:                "" => "<computed>"
+  can_ip_forward:                                      "" => "false"
+  cpu_platform:                                        "" => "<computed>"
+  create_timeout:                                      "" => "4"
+  deletion_protection:                                 "" => "false"
+  guest_accelerator.#:                                 "" => "<computed>"
+  instance_id:                                         "" => "<computed>"
+  label_fingerprint:                                   "" => "<computed>"
+  machine_type:                                        "" => "g1-small"
+  metadata.%:                                          "" => "1"
+  metadata.ssh-keys:                                   "" => "appuser:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+  metadata_fingerprint:                                "" => "<computed>"
+  name:                                                "" => "reddit-app"
+  network_interface.#:                                 "" => "1"
+  network_interface.0.access_config.#:                 "" => "1"
+  network_interface.0.access_config.0.assigned_nat_ip: "" => "<computed>"
+  network_interface.0.access_config.0.nat_ip:          "" => "<computed>"
+  network_interface.0.access_config.0.network_tier:    "" => "<computed>"
+  network_interface.0.address:                         "" => "<computed>"
+  network_interface.0.name:                            "" => "<computed>"
+  network_interface.0.network:                         "" => "default"
+  network_interface.0.network_ip:                      "" => "<computed>"
+  network_interface.0.subnetwork_project:              "" => "<computed>"
+  project:                                             "" => "<computed>"
+  scheduling.#:                                        "" => "<computed>"
+  self_link:                                           "" => "<computed>"
+  tags.#:                                              "" => "1"
+  tags.1799682348:                                     "" => "reddit-app"
+  tags_fingerprint:                                    "" => "<computed>"
+  zone:                                                "" => "europe-north1-b"
+google_compute_firewall.firewall_puma: Still creating... (10s elapsed)
+google_compute_instance.app: Still creating... (10s elapsed)
+google_compute_firewall.firewall_puma: Still creating... (20s elapsed)
+google_compute_instance.app: Still creating... (20s elapsed)
+google_compute_firewall.firewall_puma: Creation complete after 23s (ID: allow-puma-default)
+google_compute_instance.app: Provisioning with 'file'...
+google_compute_instance.app: Still creating... (30s elapsed)
+google_compute_instance.app: Still creating... (40s elapsed)
+google_compute_instance.app: Still creating... (50s elapsed)
+google_compute_instance.app: Provisioning with 'remote-exec'...
+google_compute_instance.app (remote-exec): Connecting to remote host via SSH...
+google_compute_instance.app (remote-exec):   Host: 35.228.131.18
+google_compute_instance.app (remote-exec):   User: appuser
+google_compute_instance.app (remote-exec):   Password: false
+google_compute_instance.app (remote-exec):   Private key: true
+google_compute_instance.app (remote-exec):   SSH Agent: false
+google_compute_instance.app (remote-exec):   Checking Host Key: false
+google_compute_instance.app (remote-exec): Connected!
+google_compute_instance.app (remote-exec): Cloning into '/home/appuser/reddit'...
+google_compute_instance.app (remote-exec): remote: Enumerating objects: 335, done.
+google_compute_instance.app (remote-exec): Receiving objects:   0% (1/335)
+...
+google_compute_instance.app (remote-exec): Resolving deltas: 100% (185/185), done.
+google_compute_instance.app (remote-exec): Checking connectivity... done.
+google_compute_instance.app: Still creating... (1m0s elapsed)
+google_compute_instance.app (remote-exec): Warning: the running version of Bundler is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bundler by running `gem install bundler`.                                                                                                                                                                                               
+google_compute_instance.app (remote-exec): 
+google_compute_instance.app (remote-exec): Fetching gem metadata from https://rubygems.org/.
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): Fetching version metadata from https://rubygems.org/.
+google_compute_instance.app (remote-exec): .
+google_compute_instance.app (remote-exec): Installing rake 12.0.0
+google_compute_instance.app (remote-exec): Installing net-ssh 4.1.0
+google_compute_instance.app (remote-exec): Installing bcrypt 3.1.11 with native extensions
+google_compute_instance.app: Still creating... (1m10s elapsed)
+google_compute_instance.app (remote-exec): Installing bson 4.2.2 with native extensions
+google_compute_instance.app (remote-exec): Installing bson_ext 1.5.1 with native extensions
+google_compute_instance.app (remote-exec): Installing i18n 0.8.6
+google_compute_instance.app (remote-exec): Installing puma 3.10.0 with native extensions
+google_compute_instance.app (remote-exec): Installing temple 0.8.0
+google_compute_instance.app (remote-exec): Installing tilt 2.0.8
+google_compute_instance.app (remote-exec): Installing json 2.1.0 with native extensions
+google_compute_instance.app: Still creating... (1m20s elapsed)
+google_compute_instance.app (remote-exec): Installing mustermann 1.0.2
+google_compute_instance.app (remote-exec): Installing rack 2.0.5
+google_compute_instance.app (remote-exec): Using bundler 1.11.2
+google_compute_instance.app (remote-exec): Installing net-scp 1.2.1
+google_compute_instance.app (remote-exec): Installing mongo 2.4.3
+google_compute_instance.app (remote-exec): Installing haml 5.0.2
+google_compute_instance.app (remote-exec): Installing rack-protection 2.0.2
+google_compute_instance.app (remote-exec): Installing sshkit 1.14.0
+google_compute_instance.app (remote-exec): Installing sinatra 2.0.2
+google_compute_instance.app (remote-exec): Installing airbrussh 1.3.0
+google_compute_instance.app (remote-exec): Installing capistrano 3.9.0
+google_compute_instance.app (remote-exec): Installing capistrano-bundler 1.2.0
+google_compute_instance.app (remote-exec): Installing capistrano-rvm 0.1.2
+google_compute_instance.app (remote-exec): Installing capistrano3-puma 3.1.1
+google_compute_instance.app (remote-exec): Bundle complete! 11 Gemfile dependencies, 24 gems now installed.
+google_compute_instance.app (remote-exec): Use `bundle show [gemname]` to see where a bundled gem is installed.
+google_compute_instance.app (remote-exec): Post-install message from capistrano3-puma:
+
+google_compute_instance.app (remote-exec):     All plugins need to be explicitly installed with install_plugin.
+google_compute_instance.app (remote-exec):     Please see README.md
+
+google_compute_instance.app (remote-exec): Created symlink from /etc/systemd/system/multi-user.target.wants/puma.service to /etc/systemd/system/puma.service.
+google_compute_instance.app: Creation complete after 1m24s (ID: reddit-app)
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+app_external_ip = 35.228.131.18
+
+```
+
+</p></details>
+
+### Самостоятельные задания  
+
+- Определена input переменная для приватного ключа, использующегося в определении подключения для провижинеров (connection)  
+- Определена input переменная для задания зоны в ресурсе "google_compute_instance" "app". У нее должно быть значение по умолчанию  
+- Отформатированы все конфигурационные файлы через terraform fmt  
+- Добавлен файл terraform.tfvars.example в котором указаны переменные для образца
+
+### Задание со * №1  
+
+- Опишите в коде терраформа добавление ssh ключа пользователя appuser1 в метаданные проекта  
+
+```bash
+
+resource "google_compute_project_metadata_item" "default" {
+  key   = "ssh-keys"
+  value = "appuser1:${file(var.public_key_path)}"
+}
+
+```
+
+- Выполните terraform apply и проверьте результат (публичный ключ можно брать пользователя appuser)  
+
+<details><summary>Обновление метаданных</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_instance.app: Refreshing state... (ID: reddit-app)
+google_compute_project_metadata_item.default: Creating...
+  key:     "" => "ssh-keys"
+  project: "" => "<computed>"
+  value:   "" => "appuser1:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+google_compute_project_metadata_item.default: Still creating... (10s elapsed)
+google_compute_project_metadata_item.default: Creation complete after 14s (ID: ssh-keys)
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+app_external_ip = 35.228.131.18
+
+```
+
+![SSHKeys](https://i.imgur.com/vIX7XpW.png)
+
+</p></details>
+
+
+
+<details><summary>Проверка результата</summary><p>
+
+```bash
+
+>ssh appuser@35.228.131.18
+Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1025-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+9 packages can be updated.
+0 updates are security updates.
+
+New release '18.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+*** System restart required ***
+appuser@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+>ssh appuser1@35.228.131.18
+Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1025-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+9 packages can be updated.
+0 updates are security updates.
+
+New release '18.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+*** System restart required ***
+appuser1@reddit-app:~$ 
+logout
+Connection to 35.228.131.18 closed.
+
+```
+
+</p></details>
+
+- Опишите в коде терраформа добавление ssh ключей нескольких пользователей в метаданные проекта, например appuser1, appuser2 и т.д.). Выполните terraform apply и проверьте результат
+
+```bash
+
+resource "google_compute_project_metadata_item" "default" {
+  key   = "ssh-keys"
+  value = "appuser1:${file(var.public_key_path)}\nappuser2:${file(var.public_key_path)}\nappuser3:${file(var.public_key_path)}\nappuser4:${file(var.public_key_path)}"
+}
+
+```
+
+<details><summary>Обновление метаданных</summary><p>
+
+```bash 
+
+>terraform apply -auto-approve=true
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_project_metadata_item.default: Refreshing state... (ID: ssh-keys)
+google_compute_instance.app: Refreshing state... (ID: reddit-app)
+google_compute_project_metadata_item.default: Modifying... (ID: ssh-keys)
+  value: "appuser1:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n" => "appuser1:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser2:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser3:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser4:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+google_compute_project_metadata_item.default: Still modifying... (ID: ssh-keys, 10s elapsed)
+google_compute_project_metadata_item.default: Modifications complete after 15s (ID: ssh-keys)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+app_external_ip = 35.228.131.18
+
+```
+
+![SSHKeys](https://i.imgur.com/XR3XzLA.png)
+
+</p></details>
+
+<details><summary>Проверка результата</summary><p>
+
+```bash
+
+>ssh appuser@35.228.131.18 
+appuser@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+>ssh appuser1@35.228.131.18
+appuser1@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+>ssh appuser2@35.228.131.18
+appuser2@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+>ssh appuser3@35.228.131.18
+appuser3@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+>ssh appuser4@35.228.131.18
+appuser4@reddit-app:~$ ls ../
+appuser  appuser1  appuser2  appuser3  appuser4  ubuntu  utrgroup
+appuser4@reddit-app:~$ exit
+logout
+Connection to 35.228.131.18 closed.
+
+```
+
+</p></details>
+
+- Добавьте в веб интерфейсе ssh ключ пользователю appuser_web в метаданные проекта. Выполните terraform apply и проверьте результат;
+
+<details><summary>Обновление метаданных</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_instance.app: Refreshing state... (ID: reddit-app)
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_project_metadata_item.default: Refreshing state... (ID: ssh-keys)
+google_compute_project_metadata_item.default: Modifying... (ID: ssh-keys)
+  value: "appuser1:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\nappuser2:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\nappuser3:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\nappuser4:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\nappuser_web:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd appuser_web@localhost" => "appuser1:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser2:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser3:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n\nappuser4:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+google_compute_project_metadata_item.default: Still modifying... (ID: ssh-keys, 10s elapsed)
+google_compute_project_metadata_item.default: Modifications complete after 11s (ID: ssh-keys)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+app_external_ip = 35.228.131.18
+
+```
+
+![SSHKeys](https://i.imgur.com/XR3XzLA.png)
+
+</p></details>
+
+<details><summary>Проверка результата</summary><p>
+
+```bash
+
+>ssh appuser_web@35.228.131.18
+appuser_web@35.228.131.18: Permission denied (publickey).
+
+```
+
+</p></details>
+
+- Какие проблемы вы обнаружили?  
+
+Ключи из кода терраформа добавляются в метаданные проекта и перезаписывают существующие ключи.  
+Поэтому был удалён ключ добавленный через web-интерфейс.  
+
+### Задание со * №2  
+
+- Создайте файл lb.tf и опишите в нем в коде terraform создание HTTP балансировщика, направляющего трафик на наше развернутое приложение на инстансе reddit-app. Проверьте доступность приложения по адресу балансировщика. Добавьте в output переменные адрес балансировщика.
+
+Добавлено.  
+
+- Добавьте в код еще один terraform ресурс для нового инстанса приложения, например reddit-app2, добавьте его в балансировщик и проверьте, что при остановке на одном из инстансов приложения (например systemctl stop puma), приложение продолжает быть доступным по адресу балансировщика;  
+
+Приложение доступно.  
+
+Добавьте в output переменные адрес второго инстанса;  
+
+Добавлено.  
+
+Какие проблемы вы видите в такой конфигурации приложения?
+
+  *  Нет синхронизации баз данных.  
+  *  Нет синхронизации сессий пользователей.   
+
+
+- Удалите описание reddit-app2 и попробуйте подход с заданием количества инстансов через параметр ресурса count. Переменная count должна задаваться в параметрах и по умолчанию равна 1.
+
+Добавлено.
