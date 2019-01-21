@@ -1365,5 +1365,90 @@ db_external_ip = [
 ### Самостоятельные задания №2  
 
 1. Удалил из папки terraform файлы main.tf, outputs.tf, terraform.tfvars, variables.tf, так как они теперь перенесены в stage и prod
-2. Параметризировал конфигурацию модулей насколько считаю нужным
+2. Параметризировал конфигурацию модулей насколько считаю нужным:  
+   Добавил настройки количества инстансов через переменные.  
 3. Отформатировал конфигурационные файлы, используя команду terraform fmt
+
+### Работа с реестром модулей  
+
+- Добавил модуль SweetOps/storage-bucket/google  
+- Создал бакет  
+
+  <details><summary>Результат применения</summary><p>
+
+  ![bucket](https://i.imgur.com/vFERN3g.png)
+
+  </p></details>
+
+### Задание со * №1  
+
+1. Настроил хранение стейт файла в удаленном бекенде (remote backends) для окружений stage и prod, используя Google Cloud Storage в качестве бекенда. Описание бекенда вынес в отдельный файл backend.tf  
+
+    <details><summary>Подключение бакета</summary><p>
+
+    ```bash
+
+    >terraform init
+    Initializing modules...
+      - module.app
+      - module.db
+      - module.vpc
+
+    Initializing the backend...
+
+    Successfully configured the backend "gcs"! Terraform will automatically
+    use this backend unless the backend configuration changes.
+
+    Initializing provider plugins...
+
+    Terraform has been successfully initialized!
+
+    You may now begin working with Terraform. Try running "terraform plan" to see
+    any changes that are required for your infrastructure. All Terraform commands
+    should now work.
+
+    If  you ever set or change modules or backend configuration for Terraform,
+    rerun this command to reinitialize your working directory. If you forget, other
+    commands will detect it and remind you to do so if necessary.
+
+    ```
+
+    </p></details>
+
+2. Перенёс конфигурационные файлы Terraform в другую директорию (вне репозитория). Проверил, что state-файл (terraform.tfstate) отсутствует. Запустил Terraform в обеих директориях и проконтролировал, что он "видит" текущее состояние независимо от директории, в которой запускается  
+
+3. Попробовал запустить применение конфигурации одновременно, чтобы проверить работу блокировок  
+
+    <details><summary>Блокировка</summary><p>
+
+    ```bash
+    >terraform apply -auto-approve=true
+
+    Error: Error locking state: Error acquiring the state lock: writing "gs://terraform-reddit-storage-bucket/reddit/prod/default.tflock" failed: googleapi: Error 412: Precondition Failed, conditionNotMet
+    Lock Info:
+      ID:        1548074046214749
+      Path:      gs://terraform-reddit-storage-bucket/reddit/prod/default.tflock
+      Operation: OperationTypeApply
+      Who:       user@user.localdomain
+      Version:   0.11.11
+      Created:   2019-01-21 12:34:06.121335176 +0000 UTC
+      Info:      
+
+
+    Terraform acquires a state lock to protect the state from being written
+    by multiple users at the same time. Please resolve the issue above and try
+    again. For most commands, you can disable locking with the "-lock=false"
+    flag, but this is not recommended.
+
+    ```
+
+    </p></details>
+
+### Задание с ** №2  
+
+1. Добавил необходимые provisioner в модули для деплоя и работы приложения. Файлы, используемые в provisioner, расположены в директории модуля  
+
+
+
+2. Реализовал отключение provisioner в зависимости от значения переменной provsion  
+

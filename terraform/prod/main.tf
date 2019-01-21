@@ -15,6 +15,7 @@ module "app" {
   zone            = "${var.zone}"
   app_disk_image  = "${var.app_disk_image}"
   count_app       = "${var.count_app}"
+  db_local_ip      = "${module.db.db_local_ip}"
 }
 
 module "db" {

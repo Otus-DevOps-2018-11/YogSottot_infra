@@ -14,10 +14,11 @@ resource "google_compute_instance" "app" {
     }
   }
 
+  # depends_on = ["google_compute_instance.db"]
+
   metadata {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
-
   # определение сетевого интерфейса
   network_interface {
     # сеть, к которой присоединить данный интерфейс
@@ -26,6 +27,22 @@ resource "google_compute_instance" "app" {
     # использовать static IP для доступа из Интернет
     access_config = {
       nat_ip = "${google_compute_address.app_ip.address}"
+    }
+
+    connection {
+      type        = "ssh"
+      user        = "appuser"
+      agent       = false
+      private_key = "${file(var.private_key_path)}"
+    }
+
+    provisioner "file" {
+      source      = "files/puma.service"
+      destination = "/tmp/puma.service"
+    }
+
+    provisioner "remote-exec" {
+      script = "files/deploy.sh ${var.db_local_ip}"
     }
   }
 }

@@ -7,6 +7,11 @@ variable public_key_path {
   description = "Path to the public key used for ssh access"
 }
 
+variable private_key_path {
+  description = "Path to the private key used for ssh access"
+}
+
+
 variable count_db {
   description = "Count DB instances"
   default     = "1"
@@ -15,4 +20,9 @@ variable count_db {
 variable db_disk_image {
   description = "Disk image for reddit db"
   default     = "reddit-db"
+}
+
+variable db_local_ip {
+  description = "DB local ip address"
+  default     = "127.0.0.1"
 }

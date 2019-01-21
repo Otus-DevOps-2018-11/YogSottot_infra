@@ -24,6 +24,23 @@ resource "google_compute_instance" "db" {
     # использовать ephemeral IP для доступа из Интернет
     access_config = {}
   }
+
+
+connection {
+      type        = "ssh"
+      user        = "appuser"
+      agent       = false
+      private_key = "${file(var.private_key_path)}"
+    }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i sed -i 's/127\.0\.0\.1/"${self.private_ip}"/g' /etc/mongod.conf",
+      "sudo systemctl restart mongod.service"
+    ]
+  }
+
+
 }
 
 # Правило firewall
