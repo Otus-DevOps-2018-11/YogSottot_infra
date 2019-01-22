@@ -11,7 +11,6 @@ variable private_key_path {
   description = "Path to the private key used for ssh access"
 }
 
-
 variable count_db {
   description = "Count DB instances"
   default     = "1"
@@ -23,6 +22,12 @@ variable db_disk_image {
 }
 
 variable db_local_ip {
+  type        = "list"
   description = "DB local ip address"
-  default     = "127.0.0.1"
+  default     = ["127.0.0.1"]
+}
+
+variable environment {
+  description = "Environment: prod, stage, etc"
+  default     = "prod"
 }

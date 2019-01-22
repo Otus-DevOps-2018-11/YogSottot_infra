@@ -1,6 +1,6 @@
 resource "google_compute_instance" "db" {
   count        = "${var.count_db}"
-  name         = "reddit-db-${format("%02d", count.index+1)}"
+  name         = "reddit-db-${var.environment}-${format("%02d", count.index+1)}"
   machine_type = "g1-small"
   zone         = "${var.zone}"
   tags         = ["reddit-db"]
@@ -25,27 +25,29 @@ resource "google_compute_instance" "db" {
     access_config = {}
   }
 
+  connection {
+    type        = "ssh"
+    user        = "appuser"
+    agent       = false
+    private_key = "${file(var.private_key_path)}"
+  }
 
-connection {
-      type        = "ssh"
-      user        = "appuser"
-      agent       = false
-      private_key = "${file(var.private_key_path)}"
-    }
+  provisioner "file" {
+    source      = "../modules/db/files/deploy.sh"
+    destination = "/tmp/deploy.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [
-      "sed -i sed -i 's/127\.0\.0\.1/"${self.private_ip}"/g' /etc/mongod.conf",
-      "sudo systemctl restart mongod.service"
+      "chmod +x /tmp/deploy.sh",
+      "sudo /tmp/deploy.sh ${self.network_interface.0.address}",
     ]
   }
-
-
 }
 
 # Правило firewall
 resource "google_compute_firewall" "firewall_mongo" {
-  name    = "allow-mongo-default"
+  name    = "allow-mongo-default-${var.environment}"
   network = "default"
 
   allow {

@@ -48,3 +48,8 @@ variable source_ranges {
   description = "Allowed IP addresses"
   default     = ["197.15.35.183/32"]
 }
+
+variable environment {
+  description = "Environment: prod, stage, etc"
+  default     = "prod"
+}

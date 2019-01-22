@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-db-ip=$1
+db_ip=$1
 
 sudo cat <<EOT > /etc/mongod.conf
 # mongod.conf
@@ -27,7 +27,7 @@ systemLog:
 # network interfaces
 net:
   port: 27017
-  bindIp: "${db-ip}"
+  bindIp: ${db_ip}
 
 
 #processManagement:
@@ -47,4 +47,4 @@ net:
 #snmp:
 EOT
 
-sudo systemctl restart mongod.service
+systemctl restart mongod.service
