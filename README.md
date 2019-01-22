@@ -786,6 +786,8 @@ Build 'googlecompute' finished.
 
 ## ДЗ №6  
 
+<details><summary>Спойлер</summary><p>
+
 - установлен terraform и tflint  
 - создан инстанс с помощью tf
 - добавлен ssh-ключ
@@ -1173,10 +1175,283 @@ appuser_web@35.228.131.18: Permission denied (publickey).
 
 Какие проблемы вы видите в такой конфигурации приложения?
 
-  *  Нет синхронизации баз данных.  
-  *  Нет синхронизации сессий пользователей.   
+    1. Нет синхронизации баз данных.  
+    2. Нет синхронизации сессий пользователей.  
 
 
 - Удалите описание reddit-app2 и попробуйте подход с заданием количества инстансов через параметр ресурса count. Переменная count должна задаваться в параметрах и по умолчанию равна 1.
 
 Добавлено.
+
+</p></details>
+
+## ДЗ №7  
+
+- Добавлено правило файрволла для ssh  
+- Добавлен IP для инстанса с приложением  
+- Добавлены шаблоны packer для билда VM: db.json и app.json  
+- Добавлены шаблоны terraform для развёртывания VM: db.tf и app.tf  
+- Добавлены модули terraform на основе шаблонов db.tf, app.tf и vpc.tf
+
+<details><summary>Загруженные модули</summary><p>
+
+```bash
+
+>terraform get
+- module.app
+  Getting source "modules/app"
+- module.db
+  Getting source "modules/db"
+- module.vpc
+  Getting source "modules/vpc"
+
+
+>tree .terraform/modules/
+.terraform/modules/
+├── 154ec150a1e158c95e9ac16db7935dea -> ~/YogSottot_infra/terraform/modules/vpc
+├── a9aa53bac9b6b12943ed0fbaf231f446 -> ~/YogSottot_infra/terraform/modules/db
+├── d52edfb6d63db99f07875dd8b80211c3 -> ~/YogSottot_infra/terraform/modules/app
+└── modules.json
+
+3 directories, 1 file
+
+```
+
+</p></details>
+
+### Самостоятельные задание №1  
+
+1. Проверил работу параметризованного модуля vpc. Ввёл в source_ranges чужой IP адрес, применил правило и проверил отсутствие соединения к обоим хостам по ssh. Проконтролировал, как изменилось правило файрвола в веб консоли.  
+
+<details><summary>Применение правила</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_project_metadata_item.default: Refreshing state... (ID: ssh-keys)
+google_compute_firewall.firewall_ssh: Refreshing state... (ID: default-allow-ssh)
+google_compute_instance.db: Refreshing state... (ID: reddit-db-01)
+google_compute_firewall.firewall_mongo: Refreshing state... (ID: allow-mongo-default)
+google_compute_address.app_ip: Refreshing state... (ID: infra-226118/europe-north1/reddit-app-ip)
+google_compute_instance.app: Refreshing state... (ID: reddit-app-01)
+module.vpc.google_compute_firewall.firewall_ssh: Modifying... (ID: default-allow-ssh)
+  source_ranges.1080289494: "0.0.0.0/0" => ""
+  source_ranges.4195971197: "" => "1.2.3.4/32"
+module.vpc.google_compute_firewall.firewall_ssh: Still modifying... (ID: default-allow-ssh, 10s elapsed)
+module.vpc.google_compute_firewall.firewall_ssh: Modifications complete after 11s (ID: default-allow-ssh)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+apps_external_ip = [
+    35.228.152.71
+]
+db_external_ip = [
+    35.228.131.18
+]
+
+```
+
+```bash
+
+>ssh appuser@35.228.152.71
+^C
+
+```
+
+![firelwall](https://i.imgur.com/uW6tVcs.png)
+
+</p></details>
+
+
+2. Ввёл в source_ranges свой IP адрес, применил правило и проверил наличие соединения к обоим хостам по ssh.
+
+<details><summary>Результат проверки</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_address.app_ip: Refreshing state... (ID: infra-226118/europe-north1/reddit-app-ip)
+google_compute_firewall.firewall_ssh: Refreshing state... (ID: default-allow-ssh)
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_instance.db: Refreshing state... (ID: reddit-db-01)
+google_compute_firewall.firewall_mongo: Refreshing state... (ID: allow-mongo-default)
+google_compute_project_metadata_item.default: Refreshing state... (ID: ssh-keys)
+google_compute_instance.app: Refreshing state... (ID: reddit-app-01)
+module.vpc.google_compute_firewall.firewall_ssh: Modifying... (ID: default-allow-ssh)
+  source_ranges.340670481:  "" => "197.15.35.183/32"
+  source_ranges.4195971197: "1.2.3.4/32" => ""
+module.vpc.google_compute_firewall.firewall_ssh: Still modifying... (ID: default-allow-ssh, 10s elapsed)
+module.vpc.google_compute_firewall.firewall_ssh: Modifications complete after 12s (ID: default-allow-ssh)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+apps_external_ip = [
+    35.228.152.71
+]
+db_external_ip = [
+    35.228.131.18
+]
+
+```
+
+```bash
+
+>ssh appuser@35.228.152.71
+The authenticity of host '35.228.152.71 (35.228.152.71)' can't be established.
+ECDSA key fingerprint is SHA256:LW9YC0c5uTW71K3uGTi6ZsJGnx423tvXuVKnrVRaO2Q.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '35.228.152.71' (ECDSA) to the list of known hosts.
+Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.15.0-1026-gcp x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+9 packages can be updated.
+9 updates are security updates.
+
+New release '18.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+```
+
+</p></details>
+
+3. Вернул 0.0.0.0/0 в source_ranges.
+
+<details><summary>Результат применения</summary><p>
+
+```bash
+
+>terraform apply -auto-approve=true
+google_compute_firewall.firewall_puma: Refreshing state... (ID: allow-puma-default)
+google_compute_address.app_ip: Refreshing state... (ID: infra-226118/europe-north1/reddit-app-ip)
+google_compute_firewall.firewall_mongo: Refreshing state... (ID: allow-mongo-default)
+google_compute_instance.db: Refreshing state... (ID: reddit-db-01)
+google_compute_firewall.firewall_ssh: Refreshing state... (ID: default-allow-ssh)
+google_compute_project_metadata_item.default: Refreshing state... (ID: ssh-keys)
+google_compute_instance.app: Refreshing state... (ID: reddit-app-01)
+module.vpc.google_compute_firewall.firewall_ssh: Modifying... (ID: default-allow-ssh)
+  source_ranges.1080289494: "" => "0.0.0.0/0"
+  source_ranges.340670481:  "197.15.35.183/32" => ""
+module.vpc.google_compute_firewall.firewall_ssh: Still modifying... (ID: default-allow-ssh, 10s elapsed)
+module.vpc.google_compute_firewall.firewall_ssh: Modifications complete after 12s (ID: default-allow-ssh)
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+apps_external_ip = [
+    35.228.152.71
+]
+db_external_ip = [
+    35.228.131.18
+]
+
+```
+
+![firelwall](https://i.imgur.com/ADZCm4S.png)
+
+</p></details>
+
+### Самостоятельные задания №2  
+
+1. Удалил из папки terraform файлы main.tf, outputs.tf, terraform.tfvars, variables.tf, так как они теперь перенесены в stage и prod
+2. Параметризировал конфигурацию модулей насколько считаю нужным:  
+   Добавил настройки количества и имён инстансов через переменные.  
+3. Отформатировал конфигурационные файлы, используя команду terraform fmt
+
+### Работа с реестром модулей  
+
+- Добавил модуль SweetOps/storage-bucket/google  
+- Создал бакет  
+
+  <details><summary>Результат применения</summary><p>
+
+  ![bucket](https://i.imgur.com/vFERN3g.png)
+
+  </p></details>
+
+### Задание со * №1  
+
+1. Настроил хранение стейт файла в удаленном бекенде (remote backends) для окружений stage и prod, используя Google Cloud Storage в качестве бекенда. Описание бекенда вынес в отдельный файл backend.tf  
+
+    <details><summary>Подключение бакета</summary><p>
+
+    ```bash
+
+    >terraform init
+    Initializing modules...
+      - module.app
+      - module.db
+      - module.vpc
+
+    Initializing the backend...
+
+    Successfully configured the backend "gcs"! Terraform will automatically
+    use this backend unless the backend configuration changes.
+
+    Initializing provider plugins...
+
+    Terraform has been successfully initialized!
+
+    You may now begin working with Terraform. Try running "terraform plan" to see
+    any changes that are required for your infrastructure. All Terraform commands
+    should now work.
+
+    If  you ever set or change modules or backend configuration for Terraform,
+    rerun this command to reinitialize your working directory. If you forget, other
+    commands will detect it and remind you to do so if necessary.
+
+    ```
+
+    </p></details>
+
+2. Перенёс конфигурационные файлы Terraform в другую директорию (вне репозитория). Проверил, что state-файл (terraform.tfstate) отсутствует. Запустил Terraform в обеих директориях и проконтролировал, что он "видит" текущее состояние независимо от директории, в которой запускается  
+
+3. Попробовал запустить применение конфигурации одновременно, чтобы проверить работу блокировок  
+
+    <details><summary>Блокировка</summary><p>
+
+    ```bash
+    >terraform apply -auto-approve=true
+
+    Error: Error locking state: Error acquiring the state lock: writing "gs://terraform-reddit-storage-bucket/reddit/prod/default.tflock" failed: googleapi: Error 412: Precondition Failed, conditionNotMet
+    Lock Info:
+      ID:        1548074046214749
+      Path:      gs://terraform-reddit-storage-bucket/reddit/prod/default.tflock
+      Operation: OperationTypeApply
+      Who:       user@user.localdomain
+      Version:   0.11.11
+      Created:   2019-01-21 12:34:06.121335176 +0000 UTC
+      Info:      
+
+
+    Terraform acquires a state lock to protect the state from being written
+    by multiple users at the same time. Please resolve the issue above and try
+    again. For most commands, you can disable locking with the "-lock=false"
+    flag, but this is not recommended.
+
+    ```
+
+    </p></details>
+
+### Задание с ** №2  
+
+1. Добавил необходимые provisioner в модули для деплоя и работы приложения и бд. Файлы, используемые в provisioner, расположены в директории модулей  
+
+    БД слушает на ip локальной сети. Приложение подключается к БД по локальной сети.
+
+    <details><summary>Результат</summary><p>
+
+    ![bucket](https://i.imgur.com/lzqiRgM.png)
+
+    </p></details>
