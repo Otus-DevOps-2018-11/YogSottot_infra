@@ -1591,7 +1591,7 @@ db_external_ip = [
 
 - Исследованы возможности использования dynamic inventory для GCP  
 - Выбран скрипт [```gce_googleapiclient.py```](https://github.com/ansible/ansible/pull/24505)  
-  Отличается от ```gce.py``` возможностью фильтрации по labels и тем, что использует для авторизации тот же файл, что и утилиты gcloud. Нет необходимости создавать service_account.json  
+  Отличается от ```gce.py``` тем, что использует для авторизации тот же механизм, что и утилиты gcloud. Нет необходимости создавать service_account.json  
   
   <details><summary>Проверка скрипта</summary><p>
 
