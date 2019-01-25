@@ -1462,6 +1462,8 @@ db_external_ip = [
 
 ## ДЗ №8  
 
+<details><summary>Спойлер</summary><p>
+
 - Создал инвентори файл и ansible.cfg. Убедился, что Ansible может управлять хостами.  
 - Сравнил работу модулей command, shell и service.  
 - Создал базовый плейбук.  
@@ -1486,3 +1488,101 @@ db_external_ip = [
     </p></details>
 
     Изменилось состояние ```changed=1```, так как директория отсутствовала и ansible склонировал её.  
+
+</p></details>
+
+## ДЗ №9  
+
+### Один playbook, один сценарий  
+
+- Добавлен reddit_app.yml  
+- Добавлены шаблоны  
+- Добавлены handlers  
+- Добавлены задачи надеплой кода и установку зависимостей 
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/ZPsJGdh.png)
+
+  </p></details>
+
+### Один плейбук, несколько сценариев  
+
+- Добавлен reddit_app2.yml с разбивкой задач по хостам
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/Opjdr2d.png)
+
+  </p></details>
+
+### Несколько плейбуков
+
+- Добавлены отдельные playbooks для разных хостов  
+- Добавлен site.yml объединяющий запуск playbooks
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/g89GlUY.png)
+
+  </p></details>
+
+### Провижининг в Packer  
+
+- Добавлены packer_app.yml и packer_db.yml  
+- Выполнен билд образов с использованием ansible  
+
+  <details><summary>Результат</summary><p>
+
+  ```bash
+
+  >packer.io build -var-file=packer/variables.json packer/app.json
+  googlecompute output will be in this color.
+
+  ==> googlecompute: Checking image does not exist...
+  ==> googlecompute: Creating temporary SSH key for instance...
+  ==> googlecompute: Using image: ubuntu-1604-xenial-v20190122a
+  ==> googlecompute: Creating instance...
+      googlecompute: Loading zone: europe-north1-b
+      googlecompute: Loading machine type: f1-micro
+      googlecompute: Requesting instance creation...
+      googlecompute: Waiting for creation operation to complete...
+      googlecompute: Instance has been created!
+  ==> googlecompute: Waiting for the instance to become running...
+      googlecompute: IP: 35.228.131.18
+  ==> googlecompute: Using ssh communicator to connect: 35.228.131.18
+  ==> googlecompute: Waiting for SSH to become available...
+  ==> googlecompute: Connected to SSH!
+  ==> googlecompute: Provisioning with Ansible...
+  ==> googlecompute: Executing Ansible: ansible-playbook --extra-vars packer_build_name=googlecompute packer_builder_type=googlecompute -i /tmp/packer-provisioner-ansible433725229 ~/YogSottot_infra/ansible/packer_app.yml -e ansible_ssh_private_key_file=/tmp/ansible-key581752198
+      googlecompute:
+      googlecompute: PLAY [Install Ruby and Bundler] ************************************************
+      googlecompute:
+      googlecompute: TASK [Gathering Facts] *********************************************************
+      googlecompute: ok: [default]
+      googlecompute:
+      googlecompute: TASK [Install ruby and rubygems and required packages] *************************
+      googlecompute: changed: [default]
+      googlecompute:
+      googlecompute: PLAY RECAP *********************************************************************
+      googlecompute: default                    : ok=2    changed=1    unreachable=0    failed=0
+      googlecompute:
+  ==> googlecompute: Deleting instance...
+      googlecompute: Instance has been deleted!
+  ==> googlecompute: Creating image...
+  ==> googlecompute: Deleting disk...
+      googlecompute: Disk has been deleted!
+  Build 'googlecompute' finished.
+
+  ==> Builds finished. The artifacts of successful builds are:
+  --> googlecompute: A disk image was created: reddit-app-1548405692
+
+  ```
+
+  </p></details>
+
+- На основе созданных app и db образов запущено stage окружение  
+- Проверено, что c помощью плейбука site.yml окружение конфигурируется, а приложение деплоится и работает 

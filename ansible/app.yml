@@ -1,0 +1,33 @@
+---
+- name: Configure App
+  hosts: app
+  become: true
+
+  vars:
+   db_host: "{{ hostvars[groups['db'][0]]['ansible_default_ipv4']['address'] }}"
+
+  tasks:
+   - name: Add unit file for Puma
+     copy:
+      src: files/puma.service
+      dest: /etc/systemd/system/puma.service
+     notify: restart puma
+
+   - name: Add config for DB connection
+     template:
+      src: templates/db_config.j2
+      dest: /home/appuser/db_config
+      owner: appuser
+      group: appuser
+     notify: restart puma
+
+   - name: enable puma
+     service:
+      name: puma
+      enabled: yes
+
+  handlers:
+   - name: restart puma
+     service:
+      name: puma
+      state: restarted

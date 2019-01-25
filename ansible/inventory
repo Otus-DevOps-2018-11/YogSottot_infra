@@ -2,7 +2,7 @@
 appserver ansible_host=35.228.131.18
 
 [db]
-dbserver ansible_host=35.228.152.71
+dbserver ansible_host=35.228.80.150
 
 [reddit:children]
 app

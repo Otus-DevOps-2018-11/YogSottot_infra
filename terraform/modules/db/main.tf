@@ -25,6 +25,7 @@ resource "google_compute_instance" "db" {
     access_config = {}
   }
 
+  /*
   connection {
     type        = "ssh"
     user        = "appuser"
@@ -43,6 +44,7 @@ resource "google_compute_instance" "db" {
       "sudo /tmp/deploy.sh ${self.network_interface.0.address}",
     ]
   }
+  */
 }
 
 # Правило firewall

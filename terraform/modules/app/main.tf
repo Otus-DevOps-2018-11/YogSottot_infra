@@ -29,6 +29,8 @@ resource "google_compute_instance" "app" {
       nat_ip = "${google_compute_address.app_ip.address}"
     }
   }
+
+  /*
   connection {
     type        = "ssh"
     user        = "appuser"
@@ -50,6 +52,7 @@ resource "google_compute_instance" "app" {
       "/tmp/deploy.sh ${join("\n", var.db_local_ip)}",
     ]
   }
+  */
 }
 
 resource "google_compute_address" "app_ip" {
