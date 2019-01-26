@@ -14,11 +14,14 @@ resource "google_compute_instance" "app" {
     }
   }
 
-  # depends_on = ["google_compute_instance.db"]
+  labels {
+    group = "app"
+  }
 
   metadata {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
+
   # определение сетевого интерфейса
   network_interface {
     # сеть, к которой присоединить данный интерфейс
