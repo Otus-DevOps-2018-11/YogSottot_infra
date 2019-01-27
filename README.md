@@ -1462,6 +1462,8 @@ db_external_ip = [
 
 ## ДЗ №8  
 
+<details><summary>Спойлер</summary><p>
+
 - Создал инвентори файл и ansible.cfg. Убедился, что Ansible может управлять хостами.  
 - Сравнил работу модулей command, shell и service.  
 - Создал базовый плейбук.  
@@ -1486,3 +1488,322 @@ db_external_ip = [
     </p></details>
 
     Изменилось состояние ```changed=1```, так как директория отсутствовала и ansible склонировал её.  
+
+</p></details>
+
+## ДЗ №9  
+
+### Один playbook, один сценарий  
+
+- Добавлен reddit_app.yml  
+- Добавлены шаблоны  
+- Добавлены handlers  
+- Добавлены задачи надеплой кода и установку зависимостей 
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/ZPsJGdh.png)
+
+  </p></details>
+
+### Один плейбук, несколько сценариев  
+
+- Добавлен reddit_app2.yml с разбивкой задач по хостам
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/Opjdr2d.png)
+
+  </p></details>
+
+### Несколько плейбуков
+
+- Добавлены отдельные playbooks для разных хостов  
+- Добавлен site.yml объединяющий запуск playbooks
+- Проведён деплой
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/g89GlUY.png)
+
+  </p></details>
+
+### Провижининг в Packer  
+
+- Добавлены packer_app.yml и packer_db.yml  
+- Выполнен билд образов с использованием ansible  
+
+  <details><summary>Результат</summary><p>
+
+  ```bash
+
+  >packer.io build -var-file=packer/variables.json packer/app.json
+  googlecompute output will be in this color.
+
+  ==> googlecompute: Checking image does not exist...
+  ==> googlecompute: Creating temporary SSH key for instance...
+  ==> googlecompute: Using image: ubuntu-1604-xenial-v20190122a
+  ==> googlecompute: Creating instance...
+      googlecompute: Loading zone: europe-north1-b
+      googlecompute: Loading machine type: f1-micro
+      googlecompute: Requesting instance creation...
+      googlecompute: Waiting for creation operation to complete...
+      googlecompute: Instance has been created!
+  ==> googlecompute: Waiting for the instance to become running...
+      googlecompute: IP: 35.228.131.18
+  ==> googlecompute: Using ssh communicator to connect: 35.228.131.18
+  ==> googlecompute: Waiting for SSH to become available...
+  ==> googlecompute: Connected to SSH!
+  ==> googlecompute: Provisioning with Ansible...
+  ==> googlecompute: Executing Ansible: ansible-playbook --extra-vars packer_build_name=googlecompute packer_builder_type=googlecompute -i /tmp/packer-provisioner-ansible433725229 ~/YogSottot_infra/ansible/packer_app.yml -e ansible_ssh_private_key_file=/tmp/ansible-key581752198
+      googlecompute:
+      googlecompute: PLAY [Install Ruby and Bundler] ************************************************
+      googlecompute:
+      googlecompute: TASK [Gathering Facts] *********************************************************
+      googlecompute: ok: [default]
+      googlecompute:
+      googlecompute: TASK [Install ruby and rubygems and required packages] *************************
+      googlecompute: changed: [default]
+      googlecompute:
+      googlecompute: PLAY RECAP *********************************************************************
+      googlecompute: default                    : ok=2    changed=1    unreachable=0    failed=0
+      googlecompute:
+  ==> googlecompute: Deleting instance...
+      googlecompute: Instance has been deleted!
+  ==> googlecompute: Creating image...
+  ==> googlecompute: Deleting disk...
+      googlecompute: Disk has been deleted!
+  Build 'googlecompute' finished.
+
+  ==> Builds finished. The artifacts of successful builds are:
+  --> googlecompute: A disk image was created: reddit-app-1548405692
+
+  ```
+
+  </p></details>
+
+- На основе созданных app и db образов запущено stage окружение  
+- Проверено, что c помощью плейбука site.yml окружение конфигурируется, а приложение деплоится и работает 
+
+### Задание со ⭐  
+
+- Исследованы возможности использования dynamic inventory для GCP  
+- Выбран скрипт [```gce_googleapiclient.py```](https://github.com/ansible/ansible/pull/24505)  
+  Отличается от ```gce.py``` тем, что использует для авторизации тот же механизм, что и утилиты gcloud. Нет необходимости создавать service_account.json  
+  
+  <details><summary>Проверка скрипта</summary><p>
+
+  ```bash
+
+  >ansible all -i gce_googleapiclient.py -m ping
+  reddit-app-stage-01 | SUCCESS => {
+      "changed": false,
+      "ping": "pong"
+  }
+  reddit-db-stage-01 | SUCCESS => {
+      "changed": false,
+      "ping": "pong"
+  }
+
+  ```
+
+
+  ```bash
+
+  >ansible-inventory --list -i gce_googleapiclient.py
+  {
+      "10.166.15.203": {
+          "hosts": [
+              "reddit-db-stage-01"
+          ]
+      },
+      "10.166.15.204": {
+          "hosts": [
+              "reddit-app-stage-01"
+          ]
+      },
+      "35.228.152.71": {
+          "hosts": [
+              "reddit-db-stage-01"
+          ]
+      },
+      "35.228.50.122": {
+          "hosts": [
+              "reddit-app-stage-01"
+          ]
+      },
+      "_meta": {
+          "hostvars": {
+              "reddit-app-stage-01": {
+                  "ansible_ssh_host": "35.228.50.122",
+                  "gce_description": null,
+                  "gce_id": "84892968559227027",
+                  "gce_image": "reddit-app-1548405692",
+                  "gce_machine_type": "g1-small",
+                  "gce_metadata": {
+                      "ssh-keys": "appuser:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+                  },
+                  "gce_name": "reddit-app-stage-01",
+                  "gce_network": "default",
+                  "gce_private_ip": "10.166.15.204",
+                  "gce_project": "infra-226118",
+                  "gce_public_ip": "35.228.50.122",
+                  "gce_status": "RUNNING",
+                  "gce_subnetwork": "default",
+                  "gce_tags": [
+                      "reddit-app"
+                  ],
+                  "gce_uuid": "296a106275e9777ee6849e3cf3dd4b0a74eb493f",
+                  "gce_zone": "europe-north1-b"
+              },
+              "reddit-db-stage-01": {
+                  "ansible_ssh_host": "35.228.152.71",
+                  "gce_description": null,
+                  "gce_id": "8614816361944101023",
+                  "gce_image": "reddit-db-1548406166",
+                  "gce_machine_type": "g1-small",
+                  "gce_metadata": {
+                      "ssh-keys": "appuser:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIzAKLEMEY20W7voyjl6OAPfDmpc95FLpX8SV4vP/opd support@localhost\n"
+                  },
+                  "gce_name": "reddit-db-stage-01",
+                  "gce_network": "default",
+                  "gce_private_ip": "10.166.15.203",
+                  "gce_project": "infra-226118",
+                  "gce_public_ip": "35.228.152.71",
+                  "gce_status": "RUNNING",
+                  "gce_subnetwork": "default",
+                  "gce_tags": [
+                      "reddit-db"
+                  ],
+                  "gce_uuid": "724d91495100ad4e46675209cea97bb2559796f2",
+                  "gce_zone": "europe-north1-b"
+              }
+          }
+      },
+      "all": {
+          "children": [
+              "10.166.15.203",
+              "10.166.15.204",
+              "35.228.152.71",
+              "35.228.50.122",
+              "europe-north1-b",
+              "g1-small",
+              "network_default",
+              "project_infra-226118",
+              "reddit-app-1548405692",
+              "reddit-db-1548406166",
+              "status_running",
+              "tag_reddit-app",
+              "tag_reddit-db",
+              "ungrouped"
+          ]
+      },
+      "europe-north1-b": {
+          "hosts": [
+              "reddit-app-stage-01",
+              "reddit-db-stage-01"
+          ]
+      },
+      "g1-small": {
+          "hosts": [
+              "reddit-app-stage-01",
+              "reddit-db-stage-01"
+          ]
+      },
+      "network_default": {
+          "hosts": [
+              "reddit-app-stage-01",
+              "reddit-db-stage-01"
+          ]
+      },
+      "project_infra-226118": {
+          "hosts": [
+              "reddit-app-stage-01",
+              "reddit-db-stage-01"
+          ]
+      },
+      "reddit-app-1548405692": {
+          "hosts": [
+              "reddit-app-stage-01"
+          ]
+      },
+      "reddit-db-1548406166": {
+          "hosts": [
+              "reddit-db-stage-01"
+          ]
+      },
+      "status_running": {
+          "hosts": [
+              "reddit-app-stage-01",
+              "reddit-db-stage-01"
+          ]
+      },
+      "tag_reddit-app": {
+          "hosts": [
+              "reddit-app-stage-01"
+          ]
+      },
+      "tag_reddit-db": {
+          "hosts": [
+              "reddit-db-stage-01"
+          ]
+      },
+      "ungrouped": {}
+  }
+
+  ```
+
+  </p></details>  
+
+- Скрипт добавлен в ansible.cfg и добавлены плейбуки site_dynamic.yml db_dynamic.yml app_dynamic.yml deploy_dynamic.yml которые используют его  
+
+  <details><summary>Результат деплоя</summary><p>
+
+  ![deploy](https://i.imgur.com/4co3Xj8.png)
+
+  ```bash
+
+  >ansible-playbook site_dynamic.yml 
+
+   PLAY [Configure MongoDB] ***************************************************************************************************************************************************************************************
+
+   TASK 1/1 [Gathering Facts] *************************************************************************************************************************************************************************************
+   ok: 1/1 [reddit-db-stage-01]
+
+   TASK 2/1 [Change mongo config file] ****************************************************************************************************************************************************************************
+   changed: 1/1 [reddit-db-stage-01]
+   changed: 2/1 [reddit-db-stage-01]
+
+   PLAY [Configure App] *******************************************************************************************************************************************************************************************
+
+   TASK 3/3 [Gathering Facts] *************************************************************************************************************************************************************************************
+   ok: 1/1 [reddit-app-stage-01]
+
+   TASK 4/3 [Add unit file for Puma] ******************************************************************************************************************************************************************************
+   changed: 1/1 [reddit-app-stage-01]
+
+   TASK 5/3 [Add config for DB connection] ************************************************************************************************************************************************************************
+   changed: 1/1 [reddit-app-stage-01]
+
+   TASK 6/3 [enable puma] *****************************************************************************************************************************************************************************************
+   changed: 1/1 [reddit-app-stage-01]
+   changed: 2/1 [reddit-app-stage-01]
+
+   PLAY [Deploy App] **********************************************************************************************************************************************************************************************
+
+   TASK 7/2 [Fetch the latest version of application code] ********************************************************************************************************************************************************
+   changed: 1/1 [reddit-app-stage-01]
+
+   TASK 8/2 [Bundle install] **************************************************************************************************************************************************************************************
+   changed: 1/1 [reddit-app-stage-01]
+   changed: 2/1 [reddit-app-stage-01]
+
+   PLAY RECAP *****************************************************************************************************************************************************************************************************
+   reddit-app-stage-01        : ok=8    changed=7    unreachable=0    failed=0   
+   reddit-db-stage-01         : ok=3    changed=2    unreachable=0    failed=0   
+
+  ```
+
+  </p></details>

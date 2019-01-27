@@ -14,11 +14,14 @@ resource "google_compute_instance" "app" {
     }
   }
 
-  # depends_on = ["google_compute_instance.db"]
+  labels {
+    group = "app"
+  }
 
   metadata {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
+
   # определение сетевого интерфейса
   network_interface {
     # сеть, к которой присоединить данный интерфейс
@@ -29,6 +32,8 @@ resource "google_compute_instance" "app" {
       nat_ip = "${google_compute_address.app_ip.address}"
     }
   }
+
+  /*
   connection {
     type        = "ssh"
     user        = "appuser"
@@ -50,6 +55,7 @@ resource "google_compute_instance" "app" {
       "/tmp/deploy.sh ${join("\n", var.db_local_ip)}",
     ]
   }
+  */
 }
 
 resource "google_compute_address" "app_ip" {

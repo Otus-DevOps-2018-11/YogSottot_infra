@@ -12,6 +12,10 @@ resource "google_compute_instance" "db" {
     }
   }
 
+  labels {
+    group = "db"
+  }
+
   metadata {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
@@ -25,6 +29,7 @@ resource "google_compute_instance" "db" {
     access_config = {}
   }
 
+  /*
   connection {
     type        = "ssh"
     user        = "appuser"
@@ -43,6 +48,7 @@ resource "google_compute_instance" "db" {
       "sudo /tmp/deploy.sh ${self.network_interface.0.address}",
     ]
   }
+  */
 }
 
 # Правило firewall
