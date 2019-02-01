@@ -1,0 +1,2 @@
+---
+app_db_host: "{{ hostvars['reddit-db-prod-01']['gce_private_ip'] }}"

@@ -1493,6 +1493,8 @@ db_external_ip = [
 
 ## ДЗ №9  
 
+<details><summary>Спойлер</summary><p>
+
 ### Один playbook, один сценарий  
 
 - Добавлен reddit_app.yml  
@@ -1807,3 +1809,14 @@ db_external_ip = [
   ```
 
   </p></details>
+
+</p></details>
+
+## ДЗ №10  
+
+- Созданы роли app и db  
+- Проведён деплой с использованием созданных ролей  
+- Вынесены переменные в group_vars (в том числе для dynamic inventory)  
+- Плейбуки перенесены в playbooks  
+- Исправлены шаблоны packer  
+- Проведён деплой окружениий stage и prod (в том числе с помощью dynamic inventory)  
