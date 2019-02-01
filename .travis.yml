@@ -4,6 +4,17 @@ language: bash
 before_install:
 - curl https://raw.githubusercontent.com/express42/otus-homeworks/2018-11/run.sh |
   bash
+script:
+  - ansible-lint ansible/playbooks/site.yml
+  - ansible-lint ansible/playbooks/site_dynamic.yml
+  - packer validate -var-file=packer/variables.json.example packer/app.json
+  - packer validate -var-file=packer/variables.json.example packer/db.json
+  - cd packer
+  - packer validate -var-file=variables.json.example immutable.json
+  - packer validate -var-file=variables.json.example ubuntu16.json
+  - cd ../terraform/ && terraform get && terraform init && terraform validate && tflint
+  - cd prod && terraform get && terraform init && terraform validate && tflint
+  - cd ../stage/ && terraform get && terraform init && terraform validate && tflint
 notifications:
   slack:
     rooms:

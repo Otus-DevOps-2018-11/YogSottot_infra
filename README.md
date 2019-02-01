@@ -2,6 +2,8 @@
 
 YogSottot Infra repository  
 
+[![Build Status](https://travis-ci.com/Otus-DevOps-2018-11/YogSottot_infra.svg?branch=master)](https://travis-ci.com/Otus-DevOps-2018-11/YogSottot_infra)  
+
 ## ДЗ №3  
 
 <details><summary>Спойлер</summary><p>
@@ -1851,6 +1853,22 @@ db_external_ip = [
   
   </p></details>
   
-  
+### Задание со ⭐: Работа с динамическим инвентори  
+
+- Настроено использование динамического инвентори для окружений stage и prod с помощью скрипта gce_googleapiclient.py из прошлого ДЗ  
+- Используются плейбуки app_dynamic.yml db_dynamic.yml site_dynamic.yml и групповые переменные tag_reddit-app.yml tag_reddit-db.yml  
+  Запуск через ```ansible-playbook playbooks/site_dynamic.yml```. Аутентификационные данные используются от утилит gcloud  
+
+  <details><summary>Результат</summary><p>
+
   ![deploy](https://i.imgur.com/5ZWCV6T.png)
 
+  </p></details>
+
+### Задание с ⭐⭐: Настройка TravisCI  
+
+Для коммитов в master и PR выполнябтся эти действия:  
+- ```packer validate``` для всех шаблонов  
+- ```terraform validate``` и ```tflint``` для окружений ```stage``` и ```prod```  
+- ```ansible-lint``` для плейбуков Ansible  
+- в README.md добавлен бейдж с статусом билда  
