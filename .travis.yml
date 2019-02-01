@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: required
 language: bash
 before_install:
@@ -17,9 +17,8 @@ script:
   - cd packer
   - packer validate -var-file=variables.json.example immutable.json
   - packer validate -var-file=variables.json.example ubuntu16.json
-  - cd ../terraform/ && terraform get && terraform init && terraform validate && tflint
-  - cd prod && terraform get && terraform init && terraform validate && tflint
-  - cd ../stage/ && terraform get && terraform init && terraform validate && tflint
+  - cd ../terraform/prod && terraform get && terraform validate && tflint
+  - cd ../stage/ && terraform get && terraform validate && tflint
 notifications:
   slack:
     rooms:
