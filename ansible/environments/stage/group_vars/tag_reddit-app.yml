@@ -1,2 +1,11 @@
 ---
 app_db_host: "{{ hostvars['reddit-db-stage-01']['gce_private_ip'] }}"
+
+# proxy
+nginx_sites:
+  default:
+    - listen 80 default_server
+    - server_name _
+    - location / {
+        proxy_pass http://127.0.0.1:9292;
+      }
