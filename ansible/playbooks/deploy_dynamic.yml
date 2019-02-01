@@ -14,6 +14,8 @@
      bundler:
       state: present
       chdir: /home/appuser/reddit
+     register: bundle_install_result
+     until: bundle_install_result is success
 
   handlers:
    - name: restart puma
