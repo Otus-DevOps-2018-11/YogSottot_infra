@@ -22,11 +22,13 @@ script:
   - cd ../terraform/prod
   - cp terraform.tfvars.example terraform.tfvars
   - terraform get
+  - terraform init
   - terraform validate
   - tflint
   - cd ../stage/
   - cp terraform.tfvars.example terraform.tfvars
   - terraform get
+  - terraform init
   - terraform validate
   - tflint
 notifications:
