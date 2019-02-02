@@ -2,6 +2,8 @@
 
 YogSottot Infra repository  
 
+[![Build Status](https://travis-ci.com/Otus-DevOps-2018-11/YogSottot_infra.svg?branch=master)](https://travis-ci.com/Otus-DevOps-2018-11/YogSottot_infra)  
+
 ## ДЗ №3  
 
 <details><summary>Спойлер</summary><p>
@@ -1493,6 +1495,8 @@ db_external_ip = [
 
 ## ДЗ №9  
 
+<details><summary>Спойлер</summary><p>
+
 ### Один playbook, один сценарий  
 
 - Добавлен reddit_app.yml  
@@ -1807,3 +1811,64 @@ db_external_ip = [
   ```
 
   </p></details>
+
+</p></details>
+
+## ДЗ №10  
+
+### Самостоятельное задание
+
+- Созданы роли app и db  
+- Проведён деплой с использованием созданных ролей  
+- Вынесены переменные в group_vars (в том числе для dynamic inventory)  
+- Плейбуки перенесены в playbooks  
+- Исправлены шаблоны packer  
+- Проведён деплой окружениий stage и prod (в том числе с помощью dynamic inventory)  
+- В окружения добавлены requirements.yml установлена роль jdauphant.nginx  
+- Добавил в конфигурацию Terraform открытие 80 порта для инстанса приложения  
+- Добавил вызов роли jdauphant.nginx в плейбук app.yml  
+- Применил плейбук site.yml для окружения stage и проверил, что приложение теперь доступно на 80 порту  
+
+### Работа с Ansible Vault
+
+- Создан vault_otus.key  
+- Добавлена опция vault_password_file в ansible.cfg  
+- Добавлен плейбук для создания пользователей  
+- Добавлен файл с данными пользователей для каждого окружения credentials.yml  
+- Зашифрованы файлы с данными пользователей используя vault_otus.key  
+- Проверено содержимое файлов, убедились что они зашифрованы  
+- Добавлен вызов плейбука в файл site.yml и выполнен для stage окружения  
+- Проверено, что пользователи созданы в системе
+
+  <details><summary>Пользователи</summary><p>
+
+  ```bash
+
+  cat /etc/passwd
+  ...
+  admin:x:1002:100::/home/admin:
+  qauser:x:1003:1003::/home/qauser:
+
+  ```
+  
+  </p></details>
+  
+### Задание со ⭐: Работа с динамическим инвентори  
+
+- Настроено использование динамического инвентори для окружений stage и prod с помощью скрипта gce_googleapiclient.py из прошлого ДЗ  
+- Используются плейбуки app_dynamic.yml db_dynamic.yml site_dynamic.yml и групповые переменные tag_reddit-app.yml tag_reddit-db.yml  
+  Запуск через ```ansible-playbook playbooks/site_dynamic.yml```. Аутентификационные данные используются от утилит gcloud  
+
+  <details><summary>Результат</summary><p>
+
+  ![deploy](https://i.imgur.com/5ZWCV6T.png)
+
+  </p></details>
+
+### Задание с ⭐⭐: Настройка TravisCI  
+
+Для коммитов в master и PR выполнябтся эти действия:  
+- ```packer validate``` для всех шаблонов  
+- ```terraform validate``` и ```tflint``` для окружений ```stage``` и ```prod```  
+- ```ansible-lint``` для плейбуков Ansible  
+- в README.md добавлен бейдж с статусом билда  

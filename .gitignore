@@ -6,3 +6,5 @@
 .terraform/
 /ansible/cache
 /ansible/.gce_cache
+jdauphant.nginx/
+/ansible/.imported_roles/

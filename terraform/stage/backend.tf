@@ -1,6 +1,8 @@
+/*
 terraform {
   backend "gcs" {
-    bucket = "terraform-reddit-storage-bucket"
+    bucket = "yogsottot-terraform-reddit-storage-bucket"
     prefix = "reddit/stage"
   }
 }
+*/

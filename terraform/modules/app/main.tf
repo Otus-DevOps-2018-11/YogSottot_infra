@@ -58,10 +58,11 @@ resource "google_compute_instance" "app" {
   */
 }
 
+
 resource "google_compute_address" "app_ip" {
   name = "reddit-app-ip-${var.environment}"
 }
-
+/*
 resource "google_compute_firewall" "firewall_puma" {
   name = "allow-puma-default-${var.environment}"
 
@@ -72,6 +73,25 @@ resource "google_compute_firewall" "firewall_puma" {
   allow {
     protocol = "tcp"
     ports    = ["9292"]
+  }
+
+  # Каким адресам разрешаем доступ
+  source_ranges = ["0.0.0.0/0"]
+
+  # Правило применимо для инстансов с перечисленными тэгами
+  target_tags = ["reddit-app"]
+}
+*/
+resource "google_compute_firewall" "firewall_nginx_proxy" {
+  name = "allow-nginx-proxy-${var.environment}"
+
+  # Название сети, в которой действует правило
+  network = "default"
+
+  # Какой доступ разрешить
+  allow {
+    protocol = "tcp"
+    ports    = ["80"]
   }
 
   # Каким адресам разрешаем доступ

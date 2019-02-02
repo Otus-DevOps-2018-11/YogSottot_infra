@@ -9,7 +9,7 @@ module "storage-bucket" {
   version = "0.1.1"
 
   # Имена поменяйте на другие
-  name = ["terraform-reddit-storage-bucket"]
+  name = ["yogsottot-terraform-reddit-storage-bucket"]
 }
 
 output storage-bucket_url {
