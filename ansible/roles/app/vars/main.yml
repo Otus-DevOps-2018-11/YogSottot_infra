@@ -1,2 +1,6 @@
 ---
 # vars file for app
+ruby_packages:
+   - ruby-full
+   - ruby-bundler
+   - build-essential

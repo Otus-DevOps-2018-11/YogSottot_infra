@@ -1879,3 +1879,19 @@ db_external_ip = [
 
 ## ДЗ №11. Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации  
 
+### Локальная разработка с Vagrant  
+
+- Установлен vagrant  
+- Обновлён gitignore  
+- Добавлен vagrantfile  
+- Созданы вм appserver и dbserver с помощью vagrant  
+- Добавлен base.yml для установки python2, хотя проще указать путь к python3  
+
+  ```bash
+
+  ansible.extra_vars = { ansible_python_interpreter: "/usr/bin/python3" }
+
+  ```
+- Доработана роль db, добалены файлы тасков install_mongo.yml и config_mongo.yml  
+- Доработана роль app, добалены файлы тасков puma.yml и ruby.yml. Параметризировано имя пользователя  
+

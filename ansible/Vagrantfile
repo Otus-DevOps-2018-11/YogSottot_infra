@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+MACHINES = {
+:"dbserver" => {
+               :box_name => "ubuntu/xenial64",
+#               :public => {:ip => '192.168.0.111', :adapter => 3 },
+               :net => [
+                        {ip: '10.10.10.10', adapter: 2, netmask: "255.255.255.0"},
+                       ]
+ },
+	
+:"appserver" => {
+               :box_name => "ubuntu/xenial64",
+#               :public => {:ip => '192.168.0.112', :adapter => 3 },
+               :net => [
+					   {ip: '10.10.10.20', adapter: 2, netmask: "255.255.255.0"},
+                       ]
+                      
+ }
+	
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+
+        box.vm.box = boxconfig[:box_name]
+		box.vm.host_name = boxname.to_s
+
+        boxconfig[:net].each do |ipconf|
+          box.vm.network "private_network", ipconf
+        end
+        
+        if boxconfig.key?(:public)
+          box.vm.network "public_network", boxconfig[:public]
+        end
+		
+		  config.vm.provision "ansible" do |ansible|
+				ansible.playbook = "playbooks/site.yml"
+				ansible.limit = "all"
+				ansible.extra_vars = { 
+          ansible_python_interpreter: "/usr/bin/python3",
+          deploy_user: "vagrant"
+        }
+				ansible.groups = {
+				"db" => ["dbserver"],
+        "db:vars" => {"db_mongo_bind_ip" => "{{ ansible_all_ipv4_addresses[1] }}"},
+        "app" => ["appserver"],
+        "app:vars" => { "app_db_host" => "10.10.10.10"}
+				}
+   		end
+		
+		 box.vm.provider "virtualbox" do |v|
+			v.memory = 512
+		 end
+	end
+
+  end
+
+end

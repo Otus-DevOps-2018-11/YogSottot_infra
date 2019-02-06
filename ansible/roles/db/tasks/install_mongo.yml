@@ -1,0 +1,30 @@
+---
+  - name: Add APT key
+    apt_key:
+     id: EA312927
+     keyserver: keyserver.ubuntu.com
+    register: mongodb_apt_key_result
+    until: mongodb_apt_key_result is success
+    tags: install
+
+  - name: Add APT mongodb repository
+    apt_repository:
+     repo: deb http://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/3.2 multiverse
+     state: present
+    tags: install
+
+  - name: Install mongodb package
+    apt:
+     name: mongodb-org
+     state: present
+     update_cache: yes
+    register: mongodb_packages_result
+    until: mongodb_packages_result is success
+    tags: install
+
+  - name: Enable mongodb service
+    service:
+     name: mongod
+     enabled: yes
+     state: started
+    tags: install
