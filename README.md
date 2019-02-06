@@ -1816,6 +1816,8 @@ db_external_ip = [
 
 ## ДЗ №10  
 
+<details><summary>Спойлер</summary><p>
+
 ### Самостоятельное задание
 
 - Созданы роли app и db  
@@ -1872,3 +1874,8 @@ db_external_ip = [
 - ```terraform validate``` и ```tflint``` для окружений ```stage``` и ```prod```  
 - ```ansible-lint``` для плейбуков Ansible  
 - в README.md добавлен бейдж с статусом билда  
+
+</p></details>
+
+## ДЗ №11. Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации  
+

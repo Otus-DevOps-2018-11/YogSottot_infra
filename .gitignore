@@ -8,3 +8,10 @@
 /ansible/.gce_cache
 jdauphant.nginx/
 /ansible/.imported_roles/
+# Vagrant & molecule
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
