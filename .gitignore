@@ -15,4 +15,5 @@ jdauphant.nginx/
 .molecule
 .cache
 .pytest_cache
+__pycache__
 .venv
