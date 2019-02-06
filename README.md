@@ -1895,3 +1895,32 @@ db_external_ip = [
 - Доработана роль db, добалены файлы тасков install_mongo.yml и config_mongo.yml  
 - Доработана роль app, добалены файлы тасков puma.yml и ruby.yml. Параметризировано имя пользователя  
 
+#### Задание со *  
+
+- Дополнена конфигурация Vagrant для корректной работы проксирования приложения с помощью nginx  
+  
+  <details><summary>Пример</summary><p>
+
+  ```ruby
+
+  ansible.extra_vars = {
+    ansible_python_interpreter: "/usr/bin/python3",
+      deploy_user: "vagrant",
+       "nginx_sites" => {
+         "default" => [
+          "listen 80 default_server",
+           "server_name _",
+           "location / { proxy_pass http://127.0.0.1:9292; }"
+         ]
+      }
+    }
+
+  ```
+  
+  </p></details>
+
+### Тестирование роли  
+
+
+
+
