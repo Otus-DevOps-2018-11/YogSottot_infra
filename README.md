@@ -1919,16 +1919,14 @@ db_external_ip = [
   
   </p></details>
 
-### Тестирование роли  
-
-#### Тестирование db роли  
+### Тестирование db роли  
 
 - Создан ```virtualenv -p /usr/bin/python2.7 --no-site-packages .venv``` и установлена molecule  
   Для решения проблемы со включённым на хосте selinux нужно [скопировать](https://dmsimard.com/2016/01/08/selinux-python-virtualenv-chroot-and-ansible-dont-play-nice/) python2-libselinux в .venv ```cp -r /usr/lib64/python2.7/site-packages/*selinux* .venv/lib64/python2.7/site-packages/```
 - Использована команда ```molecule init scenario --scenario-name default -r db -d vagrant``` для создания заготовки тестов для роли db  
 - Добавлены тесты, используя модули Testinfra  
 
-##### Самостоятельное задание  
+#### Самостоятельное задание  
 
 - Добавлен тест к роли db для проверки того, что БД слушает по нужному порту (27017)
 
@@ -1946,4 +1944,7 @@ db_external_ip = [
   </p></details>
 
 - Использованы роли db и app в плейбуках packer_db.yml и packer_app.yml и проверено, что всё работает как прежде  
+  (использованы теги для запуска только нужных тасков, теги указаны в шаблонах пакера)  
   
+#### Задание со *
+

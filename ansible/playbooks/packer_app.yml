@@ -8,10 +8,5 @@
       - ruby-bundler
       - build-essential
 
-  tasks:
-  - name: Install ruby and rubygems and required packages
-    apt:
-     name: "{{ ruby_packages }}"
-     state: present
-    register: ruby_packages_result
-    until: ruby_packages_result is success
+  roles:
+   - app
