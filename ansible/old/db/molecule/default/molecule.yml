@@ -1,5 +1,5 @@
 ---
-#dependency:
+# dependency:
 #  name: galaxy
 driver:
   name: vagrant
@@ -12,10 +12,10 @@ platforms:
     box: ubuntu/xenial64
 provisioner:
   name: ansible
-#  inventory:
-#   host_vars:
-#    localhost:
-#     ansible_python_interpreter: /usr/bin/python3
+  #  inventory:
+  #   host_vars:
+  #    localhost:
+  #     ansible_python_interpreter: /usr/bin/python3
   lint:
     name: ansible-lint
 scenario:
