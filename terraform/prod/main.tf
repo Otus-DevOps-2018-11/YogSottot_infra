@@ -4,11 +4,12 @@ provider "google" {
   region  = "${var.region}"
 }
 
+/*
 resource "google_compute_project_metadata_item" "default" {
   key   = "ssh-keys"
   value = "appuser:${file(var.public_key_path)}"
 }
-
+*/
 module "app" {
   source           = "../modules/app"
   public_key_path  = "${var.public_key_path}"

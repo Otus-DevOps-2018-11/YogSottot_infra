@@ -6,4 +6,3 @@
      update_cache: yes
     register: ruby_packages_result
     until: ruby_packages_result is success
-    tags: ruby
