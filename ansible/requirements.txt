@@ -12,3 +12,7 @@ oauth2client>=4.1.3
 google-api-python-client>=1.7.6
 pyasn1>=0.4.1
 pyasn1-modules>=0.2.1
+
+# molecule
+molecule>=2.6
+python-vagrant>=0.5.15

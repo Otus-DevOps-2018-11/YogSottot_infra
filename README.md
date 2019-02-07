@@ -1816,6 +1816,8 @@ db_external_ip = [
 
 ## ДЗ №10  
 
+<details><summary>Спойлер</summary><p>
+
 ### Самостоятельное задание
 
 - Созданы роли app и db  
@@ -1872,3 +1874,86 @@ db_external_ip = [
 - ```terraform validate``` и ```tflint``` для окружений ```stage``` и ```prod```  
 - ```ansible-lint``` для плейбуков Ansible  
 - в README.md добавлен бейдж с статусом билда  
+
+</p></details>
+
+## ДЗ №11. Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации  
+
+### Локальная разработка с Vagrant  
+
+- Установлен vagrant  
+- Обновлён gitignore  
+- Добавлен vagrantfile  
+- Созданы вм appserver и dbserver с помощью vagrant  
+- Добавлен base.yml для установки python2, хотя проще указать путь к python3  
+
+  ```bash
+
+  ansible.extra_vars = { ansible_python_interpreter: "/usr/bin/python3" }
+
+  ```
+- Доработана роль db, добалены файлы тасков install_mongo.yml и config_mongo.yml  
+- Доработана роль app, добалены файлы тасков puma.yml и ruby.yml. Параметризировано имя пользователя  
+
+#### Задание со *  
+
+- Дополнена конфигурация Vagrant для корректной работы проксирования приложения с помощью nginx  
+  
+  <details><summary>Пример</summary><p>
+
+  ```ruby
+
+  ansible.extra_vars = {
+    ansible_python_interpreter: "/usr/bin/python3",
+      deploy_user: "vagrant",
+       "nginx_sites" => {
+         "default" => [
+          "listen 80 default_server",
+           "server_name _",
+           "location / { proxy_pass http://127.0.0.1:9292; }"
+         ]
+      }
+    }
+
+  ```
+  
+  </p></details>
+
+### Тестирование db роли  
+
+- Создан ```virtualenv -p /usr/bin/python2.7 --no-site-packages .venv``` и установлена molecule  
+  Для решения проблемы со включённым на хосте selinux нужно [скопировать](https://dmsimard.com/2016/01/08/selinux-python-virtualenv-chroot-and-ansible-dont-play-nice/) python2-libselinux в .venv ```cp -r /usr/lib64/python2.7/site-packages/*selinux* .venv/lib64/python2.7/site-packages/```
+- Использована команда ```molecule init scenario --scenario-name default -r db -d vagrant``` для создания заготовки тестов для роли db  
+- Добавлены тесты, используя модули Testinfra  
+
+#### Самостоятельное задание  
+
+- Добавлен тест к роли db для проверки того, что БД слушает по нужному порту (27017)
+
+  <details><summary>Код</summary><p>
+
+  ```ruby
+
+  # check if MongoDB is listen on default port
+  def test_mongo_listen_on_default_port(host):
+    mongoport = host.socket("tcp://0.0.0.0:27017")
+    assert mongoport.is_listening
+
+  ```
+
+  </p></details>
+
+- Использованы роли db и app в плейбуках packer_db.yml и packer_app.yml и проверено, что всё работает как прежде  
+  (использованы теги для запуска только нужных тасков, теги указаны в шаблонах пакера)  
+  
+#### Задание со *
+
+- Вынесена роль db в [отдельный репозиторий](https://github.com/YogSottot/otus_ansible_role_db): удалена роль из репозитория infra и сделано подключение роли через requirements.yml обоих окружений
+- Подключен TravisCI для созданного репозитория с ролью db для автоматического прогона тестов в GCE (использован соответствующий драйвер в molecule)
+  У роли есть бейдж со статусом билда;
+- Настроено оповещение о билде в слак чат, который использован в предыдущих ДЗ;
+  <details><summary>оповещение</summary><p>
+
+  ![Build Status](https://i.imgur.com/EqHy47p.png)
+
+  </p></details>

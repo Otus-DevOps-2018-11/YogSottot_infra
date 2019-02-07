@@ -1,0 +1,17 @@
+---
+- name: Install Ruby and Bundler
+  hosts: all
+  become: true
+  vars:
+   ruby_packages:
+      - ruby-full
+      - ruby-bundler
+      - build-essential
+
+  tasks:
+  - name: Install ruby and rubygems and required packages
+    apt:
+     name: "{{ ruby_packages }}"
+     state: present
+    register: ruby_packages_result
+    until: ruby_packages_result is success
